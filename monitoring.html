@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoring Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="topnav">
+    <h1>Monitoring Dashboard</h1>
+  </div>
+  
+  <div class="content">
+    <div class="card-grid">
+      <!-- Gas Sensor Reading -->
+      <div class="card">
+        <p class="card-title">Gas Level</p>
+        <p class="value" id="gasValue">Loading...</p>
+      </div>
+
+      <!-- Vibration Sensor Readings -->
+      <div class="card">
+        <p class="card-title">Vibration Sensors</p>
+        <p class="value">Sensor 1: <span id="vibration1">Loading...</span></p>
+        <p class="value">Sensor 2: <span id="vibration2">Loading...</span></p>
+        <p class="value">Sensor 3: <span id="vibration3">Loading...</span></p>
+        <p class="value">Sensor 4: <span id="vibration4">Loading...</span></p>
+        <p class="value">Total 1 (in 30 Days): <span id="vibration1Total">Loading...</span></p>
+        <p class="value">Total 2 (in 30 Days): <span id="vibration2Total">Loading...</span></p>
+        <p class="value">Total 3 (in 30 Days): <span id="vibration3Total">Loading...</span></p>
+        <p class="value">Total 4 (in 30 Days): <span id="vibration4Total">Loading...</span></p>
+      </div>
+
+      <!-- Safety Status -->
+      <div class="card">
+        <p class="card-title">Safety Status</p>
+        <p class="state" id="safetyStatus">Loading...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="monitoring.js"></script>
+</body>
+</html>

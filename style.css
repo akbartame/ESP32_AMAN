@@ -1,0 +1,78 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    text-align: center;
+}
+
+.topnav {
+    background-color: #333;
+    color: white;
+    padding: 1rem;
+}
+
+.content {
+    padding: 2rem;
+}
+
+.menu-grid, .monitor-card, .control-card {
+    margin: 1rem auto;
+    max-width: 300px;
+}
+
+.menu-button, .button-on, .button-off, .button-open, .button-close {
+    width: 100%;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.menu-button {
+    background-color: #0073e6;
+}
+
+.menu-button:hover {
+    background-color: #005bb5;
+}
+
+.button-on {
+    background-color: #28a745;
+}
+
+.button-on:hover {
+    background-color: #218838;
+}
+
+.button-off, .button-close {
+    background-color: #dc3545;
+}
+
+.button-off:hover, .button-close:hover {
+    background-color: #c82333;
+}
+
+.button-open {
+    background-color: #ffc107;
+}
+
+.button-open:hover {
+    background-color: #e0a800;
+}
+
+.button-wm {
+    background-color: #cccccc;
+}
+
+.button-wm:hover {
+    background-color: #ff0000;
+}
+
+.button-OTA {
+    background-color: #008000;
+}
+
+
