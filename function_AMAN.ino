@@ -1,11 +1,24 @@
 void readSensorAll() {
   if ((WiFi.status() != WL_CONNECTED) && (millis() - previousMillisWiFi >= 3000)) {
-  Serial.print(millis());
-  Serial.println("Connection Lost: Reconnecting to WiFi...");
-  WiFi.disconnect();
-  WiFi.reconnect();
-  previousMillisWiFi = millis();
+    Serial.print(millis());
+    Serial.println(" Connection Lost: Reconnecting to WiFi...");
+    
+    WiFi.disconnect();
+    WiFi.reconnect();
+    reconnectAttempts++; // Increment the counter for failed reconnections
+    previousMillisWiFi = millis();
+
+    if (reconnectAttempts >= maxReconnectAttempts) {
+      Serial.println("Failed to reconnect after 5 attempts. Restarting...");
+      ESP.restart(); // Restart the ESP32
+    }
   }
+
+  // If connected, reset the reconnectAttempts counter
+  if (WiFi.status() == WL_CONNECTED) {
+    reconnectAttempts = 0;
+  }
+
   gasValue = analogRead(AO_PIN);
   LS1nyala = !digitalRead(limitSwitch1);
   LS2nyala = !digitalRead(limitSwitch2);
@@ -66,35 +79,61 @@ void Door(bool mode) {
 void stopDoor() {
   digitalWrite(relayPin1, LOW);
   digitalWrite(relayPin2, LOW);
+  doorIsOpen = false; // Reset the state
 }
 
 void exhaustOn(bool mode) { digitalWrite(relayExhaust, mode); }
 void buzzerOn(bool mode) { digitalWrite(buzzerPin, mode); }
 
 int gasCondition() {
-  if (gasValue < 1500) { return 0; }
-  else if (gasValue >= 1500 && gasValue < 2000) { return 1; }
+  if (gasValue < batasBawah) { return 0; }
+  else if (gasValue >= batasBawah && gasValue < batasAtas) { return 1; }
   else { return 2; }
 }
 
 
 // Functions to open/close the door with manual override check
 void OPENdoor() {
-  if (!LS1nyala) { Door(true); } 
-  else {
+  if (!doorIsOpen) { // Only update `lastOpen` when the door starts opening
+    lastOpen = millis();
+    doorIsOpen = true; // Mark the door as open
+  }
+  if (millis() - lastOpen > 100000) {
     stopDoor();
-    // Serial.println("X Pintu berhenti membuka X");
+    doorIsOpen = false; // Reset the state when stopping
+  } else {
+    Door(true);
   }
 }
-
 void CLOSEdoor() {
-  if (!LS2nyala) { Door(false); }
-  else {
-    stopDoor();
-    // Serial.println("X Pintu berhenti menutup X");
+  doorIsOpen = false; // Reset the state when stopping
+  if (LS2nyala && !isWaiting) { // Trigger waiting only once
+    isWaiting = true;           // Start the waiting process
   }
+  // Use the non-blocking wait function
+  else if (LS2nyala && isWaiting && waitNonBlocking(5)) {
+    stopDoor(); // Stop the door after 5 seconds
+    isWaiting = false; // Reset the waiting flag
+  }
+  else Door(false);
 }
 
+bool waitNonBlocking(int seconds) {
+  static unsigned long startTime = 0;
+  static bool waiting = false;
+
+  if (!waiting) {
+    startTime = millis(); // Start the timer
+    waiting = true;
+  }
+
+  if (millis() - startTime >= seconds * 1000) {
+    waiting = false; // Reset the state for the next use
+    return true;     // Indicate the wait is over
+  }
+
+  return false;      // Still waiting
+}
 void autoGas() {
   kondisi = gasCondition();
 
@@ -110,12 +149,23 @@ void autoGas() {
   // Door control based on gas condition, only if not manually controlled
   if (manualDoorControl) {
     // Manual control takes priority
-    if (manualDoorState) OPENdoor();
-    else CLOSEdoor();
-  } else { 
+    if (manualDoorState) {
+      OPENdoor();
+    }
+    else {
+      CLOSEdoor();
+      doorIsOpen = false; // Mark door as closed
+    }
+  } 
+  else { 
     // Automatic control based on gas condition
-    if (kondisi == 2) OPENdoor();
-    else CLOSEdoor();
+    if (kondisi == 2) {
+      OPENdoor();
+    }
+    else {
+      CLOSEdoor();
+      doorIsOpen = false; // Mark door as closed
+    }
   }
 }
 
@@ -226,8 +276,8 @@ void timeoutManualOverride() {
 // Function to disable manual control overrides, restoring automatic behavior
 void disableManualOverride() {
   manualExhaustControl = false;
-  manualBuzzerControl = false;
-  if (!dontAutoDoor) manualDoorControl = false;
+  if (!dontAuto) manualBuzzerControl = false;
+  if (!dontAuto) manualDoorControl = false;
   Serial.println("Web : ===Mode Auto ON===");
 }
 

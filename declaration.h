@@ -2,12 +2,17 @@ unsigned int lastResetMonth = 0;          // Stores the month of the last reset
 unsigned long lastManualControlTime = 0;  // Tracks last manual control time
 unsigned long previousMillis = 0; // Waktu terakhir fungsi dipanggil
 unsigned long previousMillisWiFi = 0;
+const int maxReconnectAttempts = 5; // Maximum reconnection attempts
+int reconnectAttempts = 0;          // Counter for reconnect attempts
 
 #define AO_PIN 34  // ESP32's pin GPIO34 connected to AO pin of the MQ2 sensor
 int gasValue = 0;
+int batasBawah = 700;
+int batasAtas = 1500;
 int kondisi = 0;
 bool LS1nyala = 0;
 bool LS2nyala = 0;
+bool isWaiting = false;
 
 unsigned int vibrationCount[4] = {0, 0, 0, 0};
 bool sensorValue1 = 0;
@@ -46,7 +51,9 @@ bool manualBuzzerControl = false;
 
 bool manualDoorControl = false;
 bool manualDoorState = false;
-bool dontAutoDoor = false;
+bool dontAuto = false;
+bool doorIsOpen = false;
+unsigned long lastOpen;
 
 bool manualExhaustControl = false;
 

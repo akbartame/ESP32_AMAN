@@ -95,12 +95,11 @@ void fetchControlCommandsFromFirebase() {
   if (safeGetBool(fbdo, "/deviceId/control/switch_kontrolPintu", doorControl)) {
     if (doorControl) { 
       Serial.printf("Door manual changed to: %s\n", doorControl ? "YES" : "NO");
-      manualDoorControl = true;
-      dontAutoDoor = true;
+      dontAuto = true;
       Serial.printf("Web : ===Door FULL Manually Controlled ON===\n");
     }
     else {
-      dontAutoDoor = false;
+      dontAuto = false;
       Serial.printf("Web : ===Door FULL Manually Controlled OFF===\n");
     }
     Serial.println("Feeding DOOR data... OK");

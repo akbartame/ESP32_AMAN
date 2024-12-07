@@ -43,7 +43,7 @@ AsyncWebServer server(80);
 WiFiManager wm;
 
 // NTP Server details
-const char* ntpServer = "pool.ntp.org";
+const char* ntpServer = "time.google.com";
 const long gmtOffset_sec = 7 * 3600; // Adjust for your timezone (e.g., GMT+7 = 7 * 3600)
 const int daylightOffset_sec = 0; // Adjust for daylight saving if needed
 
